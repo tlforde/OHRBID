@@ -1,0 +1,8 @@
+name: pybactocap
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - matplotlib
+  - biopython

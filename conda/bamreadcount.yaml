@@ -1,0 +1,7 @@
+name: bamreadcount
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - bam-readcount=0.8
