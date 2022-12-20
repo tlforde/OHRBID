@@ -22,6 +22,40 @@ E.g. to run the workflow with singularity:
 nextflow run main.nf -profile singularity
 ```
 
+## Parameters
+
+The following params must be set by the user in the `nextflow.config`
+
+* **inputDir**<br /> 
+Directory containing input fastq 
+
+* **pattern**<br />
+Glob pattern to match fastq files in inputDir
+
+* **outputDir**<br /> 
+Directory for the output results
+
+* **refDir**<br /> 
+The path to supplementary data for the workflow. All databases and supplementary files that the workflow is dependent on should be present in this directory,
+e.g. bowtie index, reference fasta, genbank file, custom txt file for discarded regions
+
+* **noMonomorphic**<br /> 
+Exclude monomorphic sites. Values: "yes" or "no"
+
+* **discRegFileCustom**<br /> 
+File name for custom txt file for discarded regions, set to null if no file
+
+* **bowtieIndexName**<br /> 
+Name of bowtie index, EXCLUDING .bt2 file extension 
+
+* **refGenomeName**<br /> 
+Name of reference genome
+
+* **genBank**<br /> 
+Name of genbank file
+  
+There are several other params whose value can optionally be changed, described and defined in the `nextflow.config`
+
 ## Additional Information
 
 ### Containers ###
@@ -41,6 +75,14 @@ E.g. The latest version of bam-readcount available through conda is 0.8, whereas
 
 ### Ignore Errors ###
 By default, when a nextflow process fails it will cause the workflow to exit. `errorStrategy 'ignore'` can be added to the process declaration to stop the workflow exiting on the failure of the process (https://www.nextflow.io/docs/latest/process.html#errorstrategy).
+
+### Work Directory ###
+Execution of the workflow takes place in the `work` directory. This work directory will grow over time, so it should be deleted as required using `rm`. Alternatively `cleanup = true` can be set in `nextflow.config` (https://www.nextflow.io/docs/latest/config.html#miscellaneous), but this will prevent the use of the resume feature (https://www.nextflow.io/docs/latest/getstarted.html#modify-and-resume)
+
+### Publish Directory ###
+In a nextflow process, `publishDir` is used to define which files are published to the outputDir.
+E.g.
+https://github.com/tlforde/OHRBID/blob/f77e0804da23b674e069e2ffe5f9526874c33588/modules/bactocapModules.nf#L246
 
 ### Executors ###
 
