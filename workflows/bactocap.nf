@@ -62,7 +62,7 @@ workflow bactocap {
 
       if ( params.discRegFileCustom != null ) {
 
-          filterPanSNPs(extractPanSNPs.out.extpansnps_out, discardRegions.out.discardregions_out, discRegFileCustom)
+          filterPanSNPs(extractPanSNPs.out.extpansnps_out, discardRegions.out.discardregions_out, discRegFileCustom.toList())
 
       }
 
