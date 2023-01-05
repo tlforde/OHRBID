@@ -24,11 +24,11 @@ workflow {
     // create channel for the bowtie index and the reference
     bowtieDir = Channel.fromPath( "${params.refDir}/*.bt2" )
 
-    refFastaDir = Channel.fromPath( "${params.refDir}/*.fasta" )
+    refFastaDir = Channel.fromPath( "${params.refDir}/${params.refGenomeName}" )
 
-    genBankDir = Channel.fromPath( "${params.refDir}/*.gb" )
+    genBankDir = Channel.fromPath( "${params.refDir}/${params.genBank}" )
 
-    discRegCustDir = Channel.fromPath( "${params.refDir}/*.txt" )
+    discRegCustDir = Channel.fromPath( "${params.refDir}/${params.discRegFileCustom}" )
 
     // main workflow
     main:
