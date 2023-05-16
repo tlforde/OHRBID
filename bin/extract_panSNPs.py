@@ -23,7 +23,7 @@ def extract_panSNPs():
 
     outFile = open('panSNPs.txt', 'w')
     for snp in SNPs:
-        outFile.write("%s\t%s\t%s\n" % (str(snp[0]), str(snp[1]), str(snp[1])))
+        outFile.write("%s\t%s\t%s\n" % (str(snp[0]), str(snp[1]), str(snp[2])))
     outFile.close()
 
 

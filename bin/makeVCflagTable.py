@@ -44,7 +44,7 @@ def make_flag_table():
                         if int(snpData[0][1]) > 0 and (float(snpData[0][2])/int(snpData[0][1])) < freqThreshold:
                             outFile.write(" below FREQUENCY THRESHOLD (%.2f)" % (float(snpData[0][2])/int(snpData[0][1])))
                             isFirstCaution = False
-                    elif str(snpData[0][0]) is 'C':
+                    elif str(snpData[0][0]) == 'C':
                         if int(snpData[0][1]) > 0 and (float(snpData[0][3])/int(snpData[0][1])) < freqThreshold:
                             outFile.write(" below FREQUENCY THRESHOLD (%.2f)" % (float(snpData[0][3])/int(snpData[0][1])))
                             isFirstCaution = False

@@ -52,7 +52,7 @@ def make_align_table():
                             outFile.write("N")
                         else:
                             outFile.write("A")
-                    elif str(snpData[0][0]) is 'C':
+                    elif str(snpData[0][0]) == 'C':
                         if int(snpData[0][1]) > 0 and (float(snpData[0][3])/int(snpData[0][1])) < freqThreshold:
                             outFile.write("N")
                         else:
