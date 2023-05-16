@@ -182,6 +182,8 @@ process computeStatistics {
     * @output hist_out tuple sample_id, path("*_coverage_histogram.png")
     */
 
+    debug true
+
     tag { sample_id }
 
     label 'low_memory'
@@ -211,6 +213,8 @@ process createStatsFile {
     * @input none
     * @output summary_out path("summary_statistics.txt")
     */
+
+    debug true
 
     label 'low_memory'
 
@@ -267,6 +271,8 @@ process discardRegions {
     * @output discardregions_out tuple path("discarded_regions.txt")
     */
 
+    debug true
+
     label 'low_memory'
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.txt", mode: 'copy'
@@ -291,6 +297,8 @@ process extractPanSNPs {
     * @output extractpansnps_out tuple path("panSNPs.txt"), path("panSNPs_intervals.txt")
     */
 
+    debug true
+
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.txt", mode: 'copy'
 
     input:
@@ -314,12 +322,12 @@ process bamreadcount {
     * @input tuple sample_id, path(bam), path(bai)
     * @input path(snp)
     * @input path(refseq)
-    * @output bamreadcount_out tuple sample_id, path("*.bamreadcount")
+    * @output bamreadcount_out tuple sample_id, path("*.bam-readcount")
     */
 
     tag { sample_id }
 
-    publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*.bamreadcount", mode: 'copy'
+    publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*.bam-readcount", mode: 'copy'
 
     input:
     tuple val(sample_id), path(bam), path(bai)
@@ -327,10 +335,10 @@ process bamreadcount {
     path(refseq)
 
     output:
-    path("*.bamreadcount", emit: bamreadcount_out)
+    path("*.bam-readcount", emit: bamreadcount_out)
 
     script:
-    readcount = "${sample_id}.bamreadcount"
+    readcount = "${sample_id}.bam-readcount"
 
     """
     bam-readcount -w 1 -b ${params.minBaseQual} -l ${snpintervals} -f ${params.refGenomeName} ${bam} > ${readcount}
@@ -343,6 +351,8 @@ process makeVCtable {
     * @input path(snps)
     * @output makeVCtable_out path("VC_table.dat")
     */
+
+    debug true
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.dat", mode: 'copy'
 
@@ -367,6 +377,8 @@ process makeVCtableNoMonomorphic {
     * @output makeVCtable_out path("VC_table.dat")
     */
 
+    debug true
+
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*{.dat,.txt}", mode: 'copy'
 
     input:
@@ -389,6 +401,8 @@ process makeVCflagTable {
     * @input path(vctable)
     * @output makeVCflagTable_out path("VC_flag_table.dat")
     */
+
+    debug true
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.dat", mode: 'copy'
 
@@ -420,6 +434,8 @@ process removeSelectedRegions {
     * @output makeVCtable_out path("VC_table_filtered.dat")
     */
 
+    debug true
+
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.dat", mode: 'copy'
 
     input:
@@ -444,6 +460,8 @@ process generateAlignmentTable {
     * @output makeVCtable_out path("alignment_table.dat")
     */
 
+    debug true
+
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.dat", mode: 'copy'
 
     input:
@@ -467,6 +485,8 @@ process filterPanSNPs {
     * @input path(probregions)
     * @output filterpansnps_out path("panSNPs_intervals_refined.txt")
     */
+
+    debug true
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.txt", mode: 'copy'
 
@@ -494,6 +514,8 @@ process filterPanSNPsNoCustom {
     * @output filterpansnps_out path("panSNPs_intervals_refined.txt")
     */
 
+    debug true
+
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.txt", mode: 'copy'
 
     input:
@@ -517,6 +539,8 @@ process extractMutatedGenes {
     * @input path(genbank)
     * @output NEEDS TO BE DEFINED
     */
+
+    debug true
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.txt", mode: 'copy'
 
