@@ -13,6 +13,11 @@ E.g. to download
 export NXF_VER="22.10.4"
 curl -fsSL https://get.nextflow.io | bash
 ```
+To download this workflow
+```
+git clone https://github.com/tlforde/OHRBID.git
+```
+
 The workflow is designed to run with either docker `-profile docker`, singularity `-profile singularity` or conda `-profile conda`. 
 The parameters for the workflow are set in the `nextflow.config`.
 The container images are pulled from the CLIMB-BIG-DATA quay.io registry and a singularity cache directory is set in the `nextflow.config`.
@@ -83,6 +88,11 @@ Execution of the workflow takes place in the `work` directory. This work directo
 In a nextflow process, `publishDir` is used to define which files are published to the outputDir.
 E.g.
 https://github.com/tlforde/OHRBID/blob/f77e0804da23b674e069e2ffe5f9526874c33588/modules/bactocapModules.nf#L246
+
+### Debug Mode ###
+For modules that are dependent on python scripts the following directive has been set
+https://github.com/tlforde/OHRBID/blob/f1ec0503ab0d02b33f609b3e6e5b3832a87bdfa3/modules/bactocapModules.nf#L185
+This ensures that error messages from the scripts are printed to the stdout
 
 ### Executors ###
 
