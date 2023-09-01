@@ -8,6 +8,7 @@ process trimmomatic {
     */
 
     tag { sample_id }
+
     label 'low_cpu'
     label 'low_memory'
 
@@ -43,6 +44,7 @@ process bowtie2 {
     */
 
     tag { sample_id }
+
     label 'medium_cpu'
     label 'medium_memory'
 
@@ -127,6 +129,7 @@ process picard {
 
     tag { sample_id }
 
+    label 'one_cpu'
     label 'medium_memory'
 
     publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*{.bam,.bai,_metrics}", mode: 'copy'
@@ -156,6 +159,7 @@ process bedtools {
 
     tag { sample_id }
 
+    label 'one_cpu'
     label 'low_memory'
 
     publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*.genomecov.hist", mode: 'copy'
@@ -186,6 +190,7 @@ process computeStatistics {
 
     tag { sample_id }
 
+    label 'one_cpu'
     label 'low_memory'
 
     publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*{.txt,.png}", mode: 'copy'
@@ -216,6 +221,7 @@ process createStatsFile {
 
     debug true
 
+    label 'one_cpu'
     label 'low_memory'
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*_statistics.txt", mode: 'copy'
@@ -245,6 +251,7 @@ process mpileupVarscan {
 
     tag { sample_id }
 
+    label 'one_cpu'
     label 'medium_memory'
 
     publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*.varscan", mode: 'copy'
@@ -273,6 +280,7 @@ process discardRegions {
 
     debug true
 
+    label 'one_cpu'
     label 'low_memory'
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.txt", mode: 'copy'
@@ -298,6 +306,9 @@ process extractPanSNPs {
     */
 
     debug true
+
+    label 'one_cpu'
+    label 'low_memory'
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.txt", mode: 'copy'
 
@@ -327,6 +338,9 @@ process bamreadcount {
 
     tag { sample_id }
 
+    label 'one_cpu'
+    label 'low_memory'
+
     publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*.bam-readcount", mode: 'copy'
 
     input:
@@ -354,6 +368,9 @@ process makeVCtable {
 
     debug true
 
+    label 'one_cpu'
+    label 'low_memory'
+
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.dat", mode: 'copy'
 
     input:
@@ -379,6 +396,9 @@ process makeVCtableNoMonomorphic {
 
     debug true
 
+    label 'one_cpu'
+    label 'low_memory'
+
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*{.dat,.txt}", mode: 'copy'
 
     input:
@@ -403,6 +423,9 @@ process makeVCflagTable {
     */
 
     debug true
+
+    label 'one_cpu'
+    label 'low_memory'
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.dat", mode: 'copy'
 
@@ -436,6 +459,9 @@ process removeSelectedRegions {
 
     debug true
 
+    label 'one_cpu'
+    label 'low_memory'
+
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.dat", mode: 'copy'
 
     input:
@@ -462,6 +488,9 @@ process generateAlignmentTable {
 
     debug true
 
+    label 'one_cpu'
+    label 'low_memory'
+
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.dat", mode: 'copy'
 
     input:
@@ -487,6 +516,9 @@ process filterPanSNPs {
     */
 
     debug true
+
+    label 'one_cpu'
+    label 'low_memory'
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.txt", mode: 'copy'
 
@@ -516,6 +548,9 @@ process filterPanSNPsNoCustom {
 
     debug true
 
+    label 'one_cpu'
+    label 'low_memory'
+
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.txt", mode: 'copy'
 
     input:
@@ -541,6 +576,9 @@ process extractMutatedGenes {
     */
 
     debug true
+
+    label 'one_cpu'
+    label 'low_memory'
 
     publishDir "${params.outputDir}/${task.process.replaceAll(":", "_")}", pattern: "*.txt", mode: 'copy'
 

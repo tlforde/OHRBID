@@ -18,7 +18,7 @@ To download this workflow
 git clone https://github.com/tlforde/OHRBID.git
 ```
 
-The workflow is designed to run with either docker `-profile docker`, singularity `-profile singularity` or conda `-profile conda`. 
+The workflow is designed to run with either docker `-profile docker`, singularity `-profile singularity` or conda `-profile conda`. An additional profile has also been added for the CLIMB-BIG-DATA notebook servers `-profile climbnotebook` (this has been configured to be compatible with the CLIMB-BIG-DATA notebook global nextflow config; the workflow will run on the Kubernetes infrastructure).
 The parameters for the workflow are set in the `nextflow.config`.
 The container images are pulled from the CLIMB-BIG-DATA quay.io registry and a singularity cache directory is set in the `nextflow.config`.
 
