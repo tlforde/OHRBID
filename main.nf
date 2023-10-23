@@ -5,6 +5,9 @@ nextflow.enable.dsl=2
 
 // import subworkflows
 include {bactocap} from './workflows/bactocap.nf'
+include {bactocap1} from './workflows/bactocapSaveSpace.nf'
+include {bactocap2} from './workflows/bactocapSaveSpace.nf'
+include {bactocap3} from './workflows/bactocapSaveSpace.nf'
 
 // main workflow
 workflow {
@@ -33,6 +36,28 @@ workflow {
     // main workflow
     main:
 
-      // BACTOCAP SUB-WORKFLOW
-      bactocap(input_files, bowtieDir, refFastaDir, genBankDir, discRegCustDir)
+      if (params.saveSpace) {
+
+        bactocap1(input_files, bowtieDir)
+
+        picardBam = bactocap1.out.picardBam
+        picardMetrics =  bactocap1.out.picardMetrics
+
+        bactocap2(refFastaDir, genBankDir, discRegCustDir, picardBam, picardMetrics)
+
+        bactocap1(input_files, bowtieDir)
+
+        picardBam2 = bactocap1.out.picardBam
+        panSNPs = bactocap2.out.panSNPs
+        panSNPsIntervals = bactocap2.out.panSNPsIntervals
+        
+        bactocap3(refFastaDir, picardBam2, panSNPs, panSNPsIntervals)
+
+      }
+
+      else {
+      
+        bactocap(input_files, bowtieDir, refFastaDir, genBankDir, discRegCustDir)
+
+      }
 }
