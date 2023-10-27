@@ -32,7 +32,7 @@ process trimmomatic {
       trimmomatic PE ${forward} ${reverse} -threads ${task.cpus} -phred33 ${sample_id}_fp.fq ${sample_id}_fu.fq.gz ${sample_id}_rp.fq ${sample_id}_ru.fq.gz SLIDINGWINDOW:4:${params.qThreshold} MINLEN:${params.minLen}
     fi
 
-    rm -f *.fq.gz
+    ${baseDir}/bin/clean_work_files.sh "${sample_id}_fu.fq.gz ${sample_id}_ru.fq.gz"
     """
 }
 
@@ -64,7 +64,7 @@ process bowtie2 {
     """
     bowtie2 -p ${task.cpus} -x ./${params.bowtieIndexName} -1 $forward -2 $reverse --maxins ${params.maxins} > ${sam}
 
-    rm -f *.fq
+    ${baseDir}/bin/clean_work_files.sh "${sample_id}_fp.fq ${sample_id}_rp.fq"
     """
 }
 
@@ -94,7 +94,7 @@ process sam2bam {
     """
     samtools sort -@ ${task.cpus} -o ${bam} ${sam}
 
-    rm -f *.sam
+    ${baseDir}/bin/clean_work_files.sh "${sample_id}.sam"
     """
 }
 
@@ -155,8 +155,7 @@ process picard {
     """
     picard MarkDuplicates INPUT=${bam} OUTPUT=${bam_nodup} METRICS_FILE=${metrics} CREATE_INDEX=true REMOVE_DUPLICATES=true
 
-    rm -f *.bam
-    rm -f *.bai
+    ${baseDir}/bin/clean_work_files.sh "${sample_id}.bam ${sample_id}.bam.bai"
     """
 }
 
@@ -279,8 +278,7 @@ process mpileupVarscan {
     """
     samtools mpileup -f ${params.refGenomeName} ${bam} | varscan pileup2snp --min-coverage ${params.covThresVarscan} --min-reads2 ${params.minReads} --min-var-freq ${params.minVarFreq} --min-avg-qual ${params.minAvgQual} > ${varscan}
 
-    rm -f *_noDuplicateReads.bam
-    rm -f *_noDuplicateReads.bai
+    ${baseDir}/bin/clean_work_files.sh "${sample_id}_noDuplicateReads.bam ${sample_id}_noDuplicateReads.bai"
     """
 }
 
@@ -369,6 +367,8 @@ process bamreadcount {
 
     """
     bam-readcount -w 1 -b ${params.minBaseQual} -l ${snpintervals} -f ${params.refGenomeName} ${bam} > ${readcount}
+
+    ${baseDir}/bin/clean_work_files.sh "${sample_id}_noDuplicateReads.bam ${sample_id}_noDuplicateReads.bai"
     """
 }
 
@@ -599,9 +599,174 @@ process extractMutatedGenes {
     path(snpfile)
     path(genbank)
 
+    output:
+    stdout emit: bactocap1Repeat_trigger
+
     script:
 
     """
     python3 ${baseDir}/bin/extract_mutated_genes.py -s ${snpfile} -g ${genbank}
+
+    printf 'trigger bactocap1 repeat run'
+    """
+}
+
+process trimmomaticRepeat {
+    /**
+    * Trim adapters from reads (https://github.com/usadellab/Trimmomatic)
+    * @input tuple sample_id, path(forward), path(reverse)
+    * @output trim_paired tuple sample_id, path("*_fp.fq"), path("*_rp.fq")
+    * @output trim_unpaired tuple sample_id, path("*_fu.fq.gz"), path("*_ru.fq.gz")
+    */
+
+    tag { sample_id }
+
+    label 'low_cpu'
+    label 'low_memory'
+
+    //publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*_{fp,rp}.fq", mode: 'copy'
+
+    input:
+    tuple val(sample_id), path(forward), path(reverse)
+    val(trigger)
+
+    output:
+    tuple val(sample_id), path("*_fp.fq"), path("*_rp.fq"), emit: trim_pairedRepeat optional true
+    path "${sample_id}.err", emit: trim_errorRepeat optional true
+
+    script:
+    error_log = "${sample_id}.err"
+
+    """
+    if [[ \$(zcat ${forward} | head -n4 | wc -l) -eq 0 ]]; then
+      echo "error: Sample ${sample_id} is empty" > ${error_log}
+      exit 0
+    else
+      trimmomatic PE ${forward} ${reverse} -threads ${task.cpus} -phred33 ${sample_id}_fp.fq ${sample_id}_fu.fq.gz ${sample_id}_rp.fq ${sample_id}_ru.fq.gz SLIDINGWINDOW:4:${params.qThreshold} MINLEN:${params.minLen}
+    fi
+
+    ${baseDir}/bin/clean_work_files.sh "${sample_id}_fu.fq.gz ${sample_id}_ru.fq.gz"
+    """
+}
+
+process bowtie2Repeat {
+    /**
+    * Align sequence reads with bowtie2 (https://github.com/BenLangmead/bowtie2)
+    * @input tuple sample_id, path(forward), path(reverse)
+    * @input index
+    * @output bowtie2_out tuple sample_id, path("*.sam")
+    */
+
+    tag { sample_id }
+
+    label 'medium_cpu'
+    label 'medium_memory'
+
+    //publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*.sam", mode: 'copy'
+
+    input:
+    tuple val(sample_id), path(forward), path(reverse)
+    path(index)
+
+    output:
+    tuple val(sample_id), path("*.sam"), emit: bowtie2Repeat_out
+
+    script:
+    sam = "${sample_id}.sam"
+
+    """
+    bowtie2 -p ${task.cpus} -x ./${params.bowtieIndexName} -1 $forward -2 $reverse --maxins ${params.maxins} > ${sam}
+
+    ${baseDir}/bin/clean_work_files.sh "${sample_id}_fp.fq ${sample_id}_rp.fq"
+    """
+}
+
+process sam2bamRepeat {
+    /**
+    * Convert sam to bam with samtools (https://github.com/samtools/samtools)
+    * @input tuple sample_id, path(sam)
+    * @output sam2bam_out tuple sample_id, path("*.bam")
+    */
+
+    tag { sample_id }
+
+    label 'medium_cpu'
+    label 'low_memory'
+
+    //publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*bam", mode: 'copy'
+
+    input:
+    tuple val(sample_id), path(sam)
+
+    output:
+    tuple val(sample_id), path("*.bam"), emit: sam2bamRepeat_out
+
+    script:
+    bam = "${sample_id}.bam"
+
+    """
+    samtools sort -@ ${task.cpus} -o ${bam} ${sam}
+
+    ${baseDir}/bin/clean_work_files.sh "${sample_id}.sam"
+    """
+}
+
+process picardRepeat {
+    /**
+    * Identify duplicate reads with picard (https://github.com/broadinstitute/picard)
+    * @input tuple sample_id, path(bam)
+    * @output picard_out tuple sample_id, path("*.bam")
+    */
+
+    tag { sample_id }
+
+    label 'one_cpu'
+    label 'medium_memory'
+
+    //publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*{.bam,.bai}", mode: 'copy'
+    publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*._metrics", mode: 'copy'
+
+
+    input:
+    tuple val(sample_id), path(bam), path(bai)
+
+    output:
+    tuple val(sample_id), path("*_noDuplicateReads.bam"), path("*_noDuplicateReads.bai"), emit: picardRepeat_out
+    tuple val(sample_id), path("*_metrics"), emit: picardRepeat_metrics
+
+    script:
+    bam_nodup = "${sample_id}_noDuplicateReads.bam"
+    metrics = "${sample_id}_noDuplicateReads.dup_metrics"
+
+    """
+    picard MarkDuplicates INPUT=${bam} OUTPUT=${bam_nodup} METRICS_FILE=${metrics} CREATE_INDEX=true REMOVE_DUPLICATES=true
+
+    ${baseDir}/bin/clean_work_files.sh "${sample_id}.bam ${sample_id}.bam.bai"
+    """
+}
+
+process indexbamRepeat {
+    /**
+    * Index bam with samtools (https://github.com/samtools/samtools)
+    * @input tuple sample_id, path(bam)
+    * @output sam2bam_out tuple sample_id, path("*.bam")
+    */
+
+    tag { sample_id }
+
+    label 'medium_cpu'
+    label 'low_memory'
+
+    //publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*bai", mode: 'copy'
+
+    input:
+    tuple val(sample_id), path(bam)
+
+    output:
+    tuple val(sample_id), path("*.bai"), emit: indexbamRepeat_out
+
+    script:
+    """
+    samtools index ${bam} -@ ${task.cpus}
     """
 }

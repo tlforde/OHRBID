@@ -8,6 +8,7 @@ include {bactocap} from './workflows/bactocap.nf'
 include {bactocap1} from './workflows/bactocapSaveSpace.nf'
 include {bactocap2} from './workflows/bactocapSaveSpace.nf'
 include {bactocap3} from './workflows/bactocapSaveSpace.nf'
+include {bactocap1Repeat} from './workflows/bactocapSaveSpace.nf'
 
 // main workflow
 workflow {
@@ -45,9 +46,11 @@ workflow {
 
         bactocap2(refFastaDir, genBankDir, discRegCustDir, picardBam, picardMetrics)
 
-        bactocap1(input_files, bowtieDir)
+        trigger = bactocap2.out.bactocap1Repeat_trigger
 
-        picardBam2 = bactocap1.out.picardBam
+        bactocap1Repeat(input_files, bowtieDir, trigger)
+
+        picardBam2 = bactocap1Repeat.out.picardBam
         panSNPs = bactocap2.out.panSNPs
         panSNPsIntervals = bactocap2.out.panSNPsIntervals
         

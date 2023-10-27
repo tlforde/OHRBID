@@ -8,6 +8,11 @@ include {bowtie2} from '../modules/bactocapSaveSpaceModules.nf' params(params)
 include {sam2bam} from '../modules/bactocapSaveSpaceModules.nf' params(params)
 include {indexbam} from '../modules/bactocapSaveSpaceModules.nf' params(params)
 include {picard} from '../modules/bactocapSaveSpaceModules.nf' params(params)
+include {trimmomaticRepeat} from '../modules/bactocapSaveSpaceModules.nf' params(params)
+include {bowtie2Repeat} from '../modules/bactocapSaveSpaceModules.nf' params(params)
+include {sam2bamRepeat} from '../modules/bactocapSaveSpaceModules.nf' params(params)
+include {indexbamRepeat} from '../modules/bactocapSaveSpaceModules.nf' params(params)
+include {picardRepeat} from '../modules/bactocapSaveSpaceModules.nf' params(params)
 include {bedtools} from '../modules/bactocapSaveSpaceModules.nf' params(params)
 include {computeStatistics} from '../modules/bactocapSaveSpaceModules.nf' params(params)
 include {mpileupVarscan} from '../modules/bactocapSaveSpaceModules.nf' params(params)
@@ -49,6 +54,34 @@ workflow bactocap1 {
       picardMetrics = picard.out.picard_metrics
 
 }
+
+workflow bactocap1Repeat {
+
+    take:
+
+      input_files
+      bowtieDir
+      trigger
+
+    main:
+
+      trimmomaticRepeat(input_files, trigger)
+
+      bowtie2Repeat(trimmomaticRepeat.out.trim_pairedRepeat, bowtieDir.toList())
+
+      sam2bamRepeat(bowtie2Repeat.out.bowtie2Repeat_out)
+
+      indexbamRepeat(sam2bamRepeat.out.sam2bamRepeat_out)
+
+      picardRepeat(sam2bamRepeat.out.sam2bamRepeat_out.join(indexbamRepeat.out.indexbamRepeat_out, by: 0))
+
+    emit:
+
+      picardBam = picardRepeat.out.picardRepeat_out
+      picardMetrics = picardRepeat.out.picardRepeat_metrics
+
+}
+
 
 workflow bactocap2 {
 
@@ -92,6 +125,7 @@ workflow bactocap2 {
 
       panSNPs = extractPanSNPs.out.extpansnps_out
       panSNPsIntervals = extractPanSNPs.out.extpansnps_intervals
+      bactocap1Repeat_trigger = extractMutatedGenes.out.bactocap1Repeat_trigger
 
 }
 
