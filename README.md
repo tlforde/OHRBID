@@ -31,6 +31,9 @@ nextflow run main.nf -profile singularity
 
 The following params must be set by the user in the `nextflow.config`
 
+* **saveSpace**<br />
+Set to `true` to save disk space, Trimmomatic->Picard steps will run twice and intermediate files will be converted to sparse files. Set to `false` and the workflow will run straight through and intermediate files will be left alone.
+
 * **inputDir**<br /> 
 Directory containing input fastq 
 
@@ -82,7 +85,7 @@ E.g. The latest version of bam-readcount available through conda is 0.8, whereas
 By default, when a nextflow process fails it will cause the workflow to exit. `errorStrategy 'ignore'` can be added to the process declaration to stop the workflow exiting on the failure of the process (https://www.nextflow.io/docs/latest/process.html#errorstrategy).
 
 ### Work Directory ###
-Execution of the workflow takes place in the `work` directory. This work directory will grow over time, so it should be deleted as required using `rm`. Alternatively `cleanup = true` can be set in `nextflow.config` (https://www.nextflow.io/docs/latest/config.html#miscellaneous), but this will prevent the use of the resume feature (https://www.nextflow.io/docs/latest/getstarted.html#modify-and-resume)
+Execution of the workflow takes place in the `work` directory. The work directory grows over time, so `cleanup = true` has been set in `nextflow.config`(https://www.nextflow.io/docs/latest/config.html#miscellaneous), note this prevents the use of the resume feature (https://www.nextflow.io/docs/latest/getstarted.html#modify-and-resume)
 
 ### Publish Directory ###
 In a nextflow process, `publishDir` is used to define which files are published to the outputDir.
