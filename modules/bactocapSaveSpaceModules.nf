@@ -138,7 +138,7 @@ process picard {
     label 'medium_memory'
 
     //publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*{.bam,.bai}", mode: 'copy'
-    publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*._metrics", mode: 'copy'
+    publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*_metrics", mode: 'copy'
 
 
     input:
@@ -724,7 +724,7 @@ process picardRepeat {
     label 'medium_memory'
 
     //publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*{.bam,.bai}", mode: 'copy'
-    publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*._metrics", mode: 'copy'
+    publishDir "${params.outputDir}/${sample_id}/${task.process.replaceAll(":", "_")}", pattern: "*_metrics", mode: 'copy'
 
 
     input:
